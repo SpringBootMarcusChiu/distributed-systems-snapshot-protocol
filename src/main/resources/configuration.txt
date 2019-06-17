@@ -1,11 +1,11 @@
 # six global parameters (see above)
 5 6 10 100 2000 15
 
-0 dc02 1234 # nodeID hostName listenPort
-1 dc03 1233
-2 dc04 1233
-3 dc05 1232
-4 dc06 1233
+0 localhost 8080 # nodeID hostName listenPort
+1 localhost 8081
+2 localhost 8082
+3 localhost 8083
+4 localhost 8084
 
 1 4     # space delimited list of neighbors for node 0
 0 2 3   # space delimited list of neighbors for node 1

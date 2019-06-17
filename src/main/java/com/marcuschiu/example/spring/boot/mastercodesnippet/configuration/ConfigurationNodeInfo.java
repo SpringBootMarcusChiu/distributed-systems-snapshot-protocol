@@ -11,5 +11,8 @@ public class ConfigurationNodeInfo {
     String hostname;
     String port;
 
-    ArrayList<String> neighbors;
+    String nodeURL;
+    String messageURL;
+
+    ArrayList<Integer> neighbors;
 }

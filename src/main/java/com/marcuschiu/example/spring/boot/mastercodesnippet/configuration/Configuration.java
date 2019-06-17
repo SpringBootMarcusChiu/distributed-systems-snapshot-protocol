@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Data
 public class Configuration {
@@ -38,7 +39,12 @@ public class Configuration {
             configurationNodeInfo.nodeID = nodeInfo[0];
             configurationNodeInfo.hostname = nodeInfo[1];
             configurationNodeInfo.port = nodeInfo[2];
-            configurationNodeInfo.neighbors = new ArrayList<>(Arrays.asList(lines.get(i + this.numNodes).split(" ")));
+            configurationNodeInfo.neighbors = Arrays.stream(lines.get(i + this.numNodes).split(" "))
+                                                    .map(Integer::parseInt)
+                                                    .collect(Collectors.toCollection(ArrayList::new));
+
+            configurationNodeInfo.nodeURL = "http://" + configurationNodeInfo.hostname + ":" + configurationNodeInfo.port;
+            configurationNodeInfo.messageURL = configurationNodeInfo.nodeURL + "/api/application/message";
 
             this.configurationNodeInfos.add(configurationNodeInfo);
         }
