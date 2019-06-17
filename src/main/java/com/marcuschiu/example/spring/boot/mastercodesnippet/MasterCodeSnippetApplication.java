@@ -1,7 +1,13 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
+import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Collections;
 
 /**
  * Created by marcus.chiu on 10/1/16.
@@ -19,8 +25,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MasterCodeSnippetApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MasterCodeSnippetApplication.class, args);
-	}
+	public static void main(String[] args) throws FileNotFoundException {
+		File file = ResourceUtils.getFile("classpath:configuration.txt");
+		Configuration configuration = new Configuration(file);
 
+		for(String arg:args) {
+			System.out.println(arg);
+		}
+
+		SpringApplication app = new SpringApplication(MasterCodeSnippetApplication.class);
+		app.setDefaultProperties(Collections
+				.singletonMap("server.port", "8083"));
+		app.run(args);
+	}
 }
