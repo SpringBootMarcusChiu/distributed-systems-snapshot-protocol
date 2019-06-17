@@ -1,0 +1,3 @@
+- install Java Version 1.8
+- mvn clean package
+- mvn spring-boot:run
