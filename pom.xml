@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.marcuschiu.example.spring.boot</groupId>
-	<artifactId>master-code-snippet</artifactId>
+	<artifactId>distributed-systems-snapshot-protocol</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>master-code-snippet</name>
 	<description>Demo project for Spring Boot</description>
@@ -26,17 +26,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
-		</dependency>
-
-		<!--
-		     used for:
-		     /main/java/package/controller/ui/DefaultUIController.java
-		     and
-		     /main/resources/templates/*.html
-		-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
 		<dependency>
