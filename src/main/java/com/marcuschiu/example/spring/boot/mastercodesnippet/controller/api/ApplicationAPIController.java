@@ -25,9 +25,4 @@ public class ApplicationAPIController {
         this.mapService.reset();
         return "map protocol reset";
     }
-
-    @GetMapping("active")
-    public @ResponseBody Boolean isActive() {
-        return this.mapService.isActive();
-    }
 }

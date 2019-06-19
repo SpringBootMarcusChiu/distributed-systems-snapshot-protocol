@@ -36,7 +36,6 @@ public class MAPService {
         }
     }
 
-    @Async
     private void startHelper() throws InterruptedException {
         Random rand = new Random();
         int difference = this.configuration.getMaxPerActive() - this.configuration.getMinPerActive();

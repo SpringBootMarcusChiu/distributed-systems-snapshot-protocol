@@ -6,26 +6,46 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Service
 public class SnapshotService {
 
     @Value("${node.id}")
-    Integer nodeID;
+    private Integer nodeID;
 
     @Autowired
-    Configuration configuration;
+    private Configuration configuration;
 
     private Boolean started = false;
+    private volatile AtomicInteger snapshotPeriod = new AtomicInteger(0);
 
     @Async
-    public synchronized void start() throws InterruptedException {
+    public synchronized void takeSnapshot() throws InterruptedException {
         if (!this.started) {
             this.started = true;
 
             while(true) {
-                Thread.sleep(200);
+                Thread.sleep(this.configuration.getSnapshotDelay());
                 System.out.println("snapshot service");
             }
         }
+    }
+
+    @Async
+    public synchronized void markerMessageReceived() throws InterruptedException {
+        if (!this.started) {
+            this.started = true;
+
+            while(true) {
+                Thread.sleep(this.configuration.getSnapshotDelay());
+                System.out.println("snapshot service");
+            }
+        }
+    }
+
+    @Async
+    public synchronized void localSnapshotReceived() {
+
     }
 }

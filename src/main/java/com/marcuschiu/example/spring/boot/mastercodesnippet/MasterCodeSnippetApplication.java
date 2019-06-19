@@ -20,7 +20,7 @@ import java.util.Collections;
  * Created by marcus.chiu on 10/1/16.
  * @SpringBootApplication - a convenience annotation that adds all the following:
  *     1. @Configuration - tags the class as a source of bean definitions
- *     2. @EnableAutoConfiguration - tells Spring Boot to start adding beans
+ *     2. @EnableAutoConfiguration - tells Spring Boot to markerMessageReceived adding beans
  *          based on classpath settings, other beans, and various property settings
  *     3. @EnableWebMvc - normally added for a Spring MVC app, but Spring boot adds
  *          it automatically when it sees 'spring-webmvc' on the classpath.
@@ -51,13 +51,13 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	}
 
 	@Value("${node.id}")
-	Integer nodeID;
+	private Integer nodeID;
 
 	@Autowired
-	MAPService mapService;
+	private MAPService mapService;
 
 	@Autowired
-	SnapshotService snapshotService;
+	private SnapshotService snapshotService;
 
 	@Bean
 	public Configuration configuration() throws FileNotFoundException {
@@ -73,11 +73,13 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		if (this.nodeID == 0) {
-			System.out.println("This is Node 0");
+			System.out.println("THIS NODE IS ZERO");
 			System.out.println("press any key to start");
 			System.in.read();
 			this.mapService.start();
-			//this.snapshotService.start();
-		}
+			this.snapshotService.markerMessageReceived();
+		} else {
+		    // every other node waits for node zero
+        }
 	}
 }
