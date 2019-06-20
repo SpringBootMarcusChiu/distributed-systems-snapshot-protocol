@@ -1,14 +1,17 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MAPService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.SnapshotService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.AppMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.AppMessageService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MarkerMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,6 +32,7 @@ import java.util.Collections;
  *     4. @ComponentScan - tells Spring to look for other components, configurations,
  *          and services in the package this class belongs to, allowing it to find the controllers
  */
+@EnableAsync
 @SpringBootApplication
 public class MasterCodeSnippetApplication implements CommandLineRunner {
 
@@ -54,10 +58,10 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	private Integer nodeID;
 
 	@Autowired
-	private MAPService mapService;
+	MarkerMessageService markerMessageService;
 
 	@Autowired
-	private SnapshotService snapshotService;
+	AppMessageService appMessageService;
 
 	@Bean
 	public Configuration configuration() throws FileNotFoundException {
@@ -73,11 +77,17 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		if (this.nodeID == 0) {
-			System.out.println("THIS NODE IS ZERO");
-			System.out.println("press any key to start");
+			System.out.println("\n\nTHIS NODE IS ZERO");
+			System.out.println("press any key to startMAPProtocol");
 			System.in.read();
-			this.mapService.start();
-			this.snapshotService.markerMessageReceived();
+
+			AppMessage appMessage = new AppMessage();
+			appMessage.setFromNodeID(0);
+			appMessageService.acceptMessage(appMessage);
+
+//			MarkerMessage markerMessage = new MarkerMessage();
+//			markerMessage.setFromNodeID(0);
+//			markerMessage.setSnapshotPeriod(1);
 		} else {
 		    // every other node waits for node zero
         }

@@ -44,7 +44,6 @@ public class Configuration {
                                                     .collect(Collectors.toCollection(ArrayList::new));
 
             configurationNodeInfo.nodeURL = "http://" + configurationNodeInfo.hostname + ":" + configurationNodeInfo.port;
-            configurationNodeInfo.messageURL = configurationNodeInfo.nodeURL + "/api/application/message";
 
             this.configurationNodeInfos.add(configurationNodeInfo);
         }
