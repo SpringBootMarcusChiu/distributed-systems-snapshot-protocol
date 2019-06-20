@@ -1,6 +1,7 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet.controller;
 
-import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessageResponse;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MarkerMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,8 +16,7 @@ public class MarkerMessageController {
     private MarkerMessageService markerMessageService;
 
     @PostMapping("/marker")
-    public @ResponseBody String messageControl(@RequestBody MarkerMessage markerMessage) {
-        markerMessageService.acceptMessage(markerMessage);
-        return "message received";
+    public @ResponseBody MarkerMessageResponse messageControl(@RequestBody MarkerMessage markerMessage) {
+        return markerMessageService.acceptMessage(markerMessage);
     }
 }

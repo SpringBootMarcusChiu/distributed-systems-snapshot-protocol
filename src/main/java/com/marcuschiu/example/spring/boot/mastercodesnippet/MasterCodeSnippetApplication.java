@@ -1,8 +1,9 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.AppMessage;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.AppMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessageResponse;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.AppMessageService;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MarkerMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 
 		for(String arg : args) {
 			if (arg.contains("node.id")) {
-				Integer nodeID = Integer.parseInt(arg.split("=")[1]);
+				int nodeID = Integer.parseInt(arg.split("=")[1]);
 
 				SpringApplication app = new SpringApplication(MasterCodeSnippetApplication.class);
 				app.setAddCommandLineProperties(true);
@@ -81,15 +82,16 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 			System.out.println("press any key to startMAPProtocol");
 			System.in.read();
 
-			AppMessage appMessage = new AppMessage();
-			appMessage.setFromNodeID(0);
-			appMessageService.acceptMessage(appMessage);
+//			AppMessage appMessage = new AppMessage();
+//			appMessage.setFromNodeID(0);
+//			appMessageService.acceptMessage(appMessage);
 
-//			MarkerMessage markerMessage = new MarkerMessage();
-//			markerMessage.setFromNodeID(0);
-//			markerMessage.setSnapshotPeriod(1);
-		} else {
-		    // every other node waits for node zero
-        }
+			MarkerMessage markerMessage = new MarkerMessage();
+			markerMessage.setFromNodeID(0);
+			markerMessage.setSnapshotPeriod(1);
+			MarkerMessageResponse markerMessageResponse = markerMessageService.acceptMessage(markerMessage);
+			System.out.println(markerMessageResponse.getMarkerMessageResponseLocals());
+		}
+		// every other node waits for node zero
 	}
 }

@@ -1,4 +1,4 @@
-package com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model;
+package com.marcuschiu.example.spring.boot.mastercodesnippet.model;
 
 import lombok.Data;
 

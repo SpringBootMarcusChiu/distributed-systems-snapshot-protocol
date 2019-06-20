@@ -1,7 +1,9 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.controller.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessageResponse;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessageResponseLocal;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,16 +33,38 @@ public class MarkerMessageService {
         snapshotPeriod = new AtomicInteger(0);
     }
 
-    public void acceptMessage(MarkerMessage markerMessage) {
-        takeSnapshot();
-        sendMarkerMessagesToNeighbors(markerMessage);
+    public MarkerMessageResponse acceptMessage(MarkerMessage markerMessage) {
+        MarkerMessageResponse markerMessageResponse;
+
+        if (markerMessage.getSnapshotPeriod() > snapshotPeriod.get()) {
+            System.out.println("received marker message from: " + markerMessage.getFromNodeID() + " - first");
+            snapshotPeriod.incrementAndGet();
+            takeSnapshot();
+            markerMessageResponse = sendMarkerMessagesToNeighbors(markerMessage);
+            markerMessageResponse.setIsDuplicate(false);
+            return markerMessageResponse;
+        } else {
+            System.out.println("received marker message from: " + markerMessage.getFromNodeID() + " - duplicate");
+            markerMessageResponse = new MarkerMessageResponse();
+            markerMessageResponse.setIsDuplicate(true);
+            return markerMessageResponse;
+        }
     }
 
     private void takeSnapshot() {
-        System.out.println("taking snapshot");
+//        System.out.println("taking snapshot");
     }
 
-    private void sendMarkerMessagesToNeighbors(MarkerMessage markerMessage) {
+    private MarkerMessageResponse sendMarkerMessagesToNeighbors(MarkerMessage markerMessage) {
+        MarkerMessageResponse markerMessageResponse = new MarkerMessageResponse();
+        markerMessageResponse.setFromNodeID(nodeID);
+        markerMessageResponse.setMarkerMessageResponseLocals(new ArrayList<>());
+        markerMessageResponse.setSnapshotPeriod(markerMessage.getSnapshotPeriod());
+
+        MarkerMessageResponseLocal markerMessageResponseLocal = new MarkerMessageResponseLocal();
+        markerMessageResponseLocal.setNodeID(nodeID);
+        markerMessageResponse.getMarkerMessageResponseLocals().add(markerMessageResponseLocal);
+
         ArrayList<Integer> neighbors = configuration.getConfigurationNodeInfos().get(nodeID).getNeighbors();
 
         for (Integer neighborID : neighbors) {
@@ -48,15 +72,21 @@ public class MarkerMessageService {
                 String url = configuration.getConfigurationNodeInfos().get(neighborID).getNodeURL() + "/marker";
 
                 MarkerMessage markerMessageToNeighbor = new MarkerMessage();
-                markerMessage.setFromNodeID(nodeID);
-                markerMessage.setSnapshotPeriod(markerMessage.getSnapshotPeriod());
+                markerMessageToNeighbor.setFromNodeID(nodeID);
+                markerMessageToNeighbor.setSnapshotPeriod(markerMessage.getSnapshotPeriod());
 
-                HttpEntity<MarkerMessage> request = new HttpEntity<>(markerMessageToNeighbor);
+                MarkerMessageResponse markerMessageResponseNeighbor = restTemplate.postForObject(url, markerMessageToNeighbor, MarkerMessageResponse.class);
 
-                restTemplate.postForEntity(url, request, String.class);
+                if (!markerMessageResponseNeighbor.getIsDuplicate()) {
+                    for (MarkerMessageResponseLocal mmrl : markerMessageResponseNeighbor.getMarkerMessageResponseLocals()) {
+                        markerMessageResponse.getMarkerMessageResponseLocals().add(mmrl);
+                    }
+                }
 
                 System.out.println("sent marker message to node: " + neighborID);
             }
         }
+
+        return markerMessageResponse;
     }
 }
