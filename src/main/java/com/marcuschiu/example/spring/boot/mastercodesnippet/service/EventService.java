@@ -1,11 +1,7 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.model.AppMessage;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.model.ConvergeCastMessage;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.AppMessageService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.MapProtocolService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.MarkerMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -33,6 +29,16 @@ public class EventService {
     MarkerMessageService markerMessageService;
 
     @Async
+    public void sendAppMessage(Integer toNodeID) {
+        reLock.lock();
+        try {
+            appMessageService.sendAppMessage(toNodeID);
+        } finally {
+            reLock.unlock();
+        }
+    }
+
+    @Async
     public void process(AppMessage appMessage) {
         reLock.lock();
         try {
@@ -48,25 +54,6 @@ public class EventService {
         reLock.lock();
         try {
             markerMessageService.process(markerMessage);
-        } finally {
-            reLock.unlock();
-        }
-    }
-
-    @Async
-    public void process(ConvergeCastMessage convergeCastMessage) {
-        reLock.lock();
-        try {
-        } finally {
-            reLock.unlock();
-        }
-    }
-
-    @Async
-    public void sendAppMessage(Integer toNodeID) {
-        reLock.lock();
-        try {
-            appMessageService.sendAppMessage(toNodeID);
         } finally {
             reLock.unlock();
         }

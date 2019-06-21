@@ -1,8 +1,8 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.StateService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MapProtocolService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -10,11 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Collections;
 
 /**
@@ -35,7 +33,8 @@ import java.util.Collections;
 public class MasterCodeSnippetApplication implements CommandLineRunner {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		File file = ResourceUtils.getFile("classpath:configuration.txt");
+		File file = new File("config/");
+		file = file.listFiles()[0];
 		Configuration configuration = new Configuration(file);
 
 		for(String arg : args) {
@@ -56,14 +55,15 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
     private Integer nodeID;
 
     @Autowired
-	EventService eventService;
+	MapProtocolService mapProtocolService;
 
     @Autowired
 	StateService stateService;
 
     @Bean
     public Configuration configuration() throws FileNotFoundException {
-        File file = ResourceUtils.getFile("classpath:configuration.txt");
+		File file = new File("config/");
+		file = file.listFiles()[0];
         return new Configuration(file);
     }
 
@@ -75,16 +75,13 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		if (nodeID == 0) {
-			System.out.println("\n\nTHIS NODE IS ZERO");
-			System.out.println("press any key to startMAPProtocol");
-			System.in.read();
-
-//			AppMessage appMessage = new AppMessage();
-//			appMessage.setSnapshotPeriod(0);
-//			appMessage.setFromNodeID(0);
-//			eventService.process(appMessage);
-
-			stateService.selfInitiateSnapshot();
+//			System.out.println("\n\nTHIS NODE IS ZERO");
+//			System.out.println("press any key to startMAPProtocol");
+//			System.in.read();
+//
+//			mapProtocolService.startMAPProtocol();
+//			Thread.sleep(1000);
+//			stateService.selfInitiateSnapshot();
 		}
 		// every other node waits for node zero
 	}

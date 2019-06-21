@@ -1,4 +1,4 @@
-package com.marcuschiu.example.spring.boot.mastercodesnippet.service.util;
+package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.ConfigurationNodeInfo;
@@ -30,15 +30,11 @@ public class AppMessageService {
     StateService stateService;
 
     private volatile AtomicInteger numAppMessagesSent;
-    private volatile AppMessage templateAppMessage;
     private volatile HashMap<Integer, String> nodeAppURLs;
 
     @PostConstruct
     public void AppMessageService() {
         numAppMessagesSent = new AtomicInteger(0);
-
-        templateAppMessage = new AppMessage();
-        templateAppMessage.setFromNodeID(nodeID);
 
         nodeAppURLs = new HashMap<>();
         for (ConfigurationNodeInfo configurationNodeInfo : configuration.getConfigurationNodeInfos()) {
@@ -54,16 +50,15 @@ public class AppMessageService {
     }
 
     public void sendAppMessage(Integer toNodeID) {
-        templateAppMessage.setSnapshotPeriod(stateService.getCurrentSnapshotPeriod().get());
+        AppMessage appMessageToSend = stateService.updateLocalState_SendingAppMessage();
 
         restTemplate.postForObject(
                 nodeAppURLs.get(toNodeID),
-                templateAppMessage,
+                appMessageToSend,
                 String.class);
 
         numAppMessagesSent.incrementAndGet();
 
-        stateService.updateLocalState_SendingAppMessage(templateAppMessage);
-        System.out.println("SENT APP MESSAGE - to node id: " + toNodeID);
+        System.out.println("SENT APP MESSAGE - to node id: " + toNodeID + " - MESSAGE STATE: " + appMessageToSend.getLocalState().toString());
     }
 }

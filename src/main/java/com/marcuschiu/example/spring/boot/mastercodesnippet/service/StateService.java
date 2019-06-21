@@ -1,4 +1,4 @@
-package com.marcuschiu.example.spring.boot.mastercodesnippet.service.util;
+package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.model.AppMessage;
@@ -27,19 +27,20 @@ public class StateService {
     @Autowired
     MarkerMessageService markerMessageService;
 
+    @Autowired
+    ConvergeCastMessageService convergeCastMessageService;
+
     private Integer numNeighbors;
 
     public volatile ArrayList<Integer> localState;
     private volatile AtomicInteger currentSnapshotPeriod;
     private volatile HashMap<Integer, LocalChannelState> inProgress;
-    private volatile HashMap<Integer, LocalChannelState> done;
 
     @PostConstruct
     public void StateService() {
         currentSnapshotPeriod = new AtomicInteger(0);
         numNeighbors = configuration.getConfigurationNodeInfos().get(nodeID).getNeighborNodeIDs().size();
         inProgress = new HashMap<>();
-        done = new HashMap<>();
 
         localState = new ArrayList<>();
         for (int i = 0; i < configuration.getNumNodes(); i++) {
@@ -70,11 +71,16 @@ public class StateService {
     }
 
     private void updateLocalState_ReceivedAppMessage(AppMessage appMessage) {
-
+        localState.set(nodeID, localState.get(nodeID) + 1);
     }
 
-    public void updateLocalState_SendingAppMessage(AppMessage appMessage) {
-
+    public AppMessage updateLocalState_SendingAppMessage() {
+        localState.set(nodeID, localState.get(nodeID) + 1);
+        AppMessage appMessageToSend = new AppMessage();
+        appMessageToSend.setSnapshotPeriod(currentSnapshotPeriod.get());
+        appMessageToSend.setLocalState((ArrayList<Integer>)localState.clone());
+        appMessageToSend.setFromNodeID(nodeID);
+        return appMessageToSend;
     }
 
     public void processMarkerMessage(MarkerMessage markerMessage) {
@@ -123,9 +129,10 @@ public class StateService {
             Integer numReceived = localChannelState.incAndGetNumMarkerMessagesReceived();
             if (numReceived.equals(numNeighbors)) {
                 inProgress.remove(markerSnapshotPeriod);
-                done.put(markerSnapshotPeriod, localChannelState);
-                System.out.println(localChannelState);
-                System.out.println("DONE: received all marker messages");
+                System.out.println("RECEIVED All Marker Messages For Snapshot Period: " + markerSnapshotPeriod);
+                convergeCastMessageService.processSelfLocalChannelState(
+                        markerSnapshotPeriod,
+                        localChannelState);
             }
         } else {
             System.out.println("ERROR: received useless marker message");

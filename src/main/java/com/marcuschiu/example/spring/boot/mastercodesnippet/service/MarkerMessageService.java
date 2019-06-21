@@ -1,11 +1,10 @@
-package com.marcuschiu.example.spring.boot.mastercodesnippet.service.util;
+package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
