@@ -1,11 +1,9 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet.service;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

@@ -1,6 +1,7 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MapProtocolService;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +53,16 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	}
 
     @Value("${node.id}")
-    private Integer nodeID;
+	Integer nodeID;
+
+	@Autowired
+	Configuration configuration;
 
     @Autowired
 	MapProtocolService mapProtocolService;
 
     @Autowired
-	StateService stateService;
+	EventService eventService;
 
     @Bean
     public Configuration configuration() throws FileNotFoundException {
@@ -75,14 +79,21 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		if (nodeID == 0) {
-//			System.out.println("\n\nTHIS NODE IS ZERO");
-//			System.out.println("press any key to startMAPProtocol");
-//			System.in.read();
-//
-//			mapProtocolService.startMAPProtocol();
-//			Thread.sleep(1000);
-//			stateService.selfInitiateSnapshot();
+			System.out.println("\n\nTHIS NODE IS ZERO");
+			System.out.println("press any key to start");
+			System.in.read();
+
+			mapProtocolService.startMAPProtocol();
+			runSnapshot();
 		}
 		// every other node waits for node zero
+	}
+
+	public void runSnapshot() throws InterruptedException {
+    	Integer delay = configuration.getSnapshotDelay();
+    	for (int i = 0; i < 4; i++) {
+    		Thread.sleep(delay);
+			eventService.selfInitiateSnapshot();
+		}
 	}
 }

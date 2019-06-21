@@ -30,6 +30,9 @@ public class StateService {
     @Autowired
     ConvergeCastMessageService convergeCastMessageService;
 
+    @Autowired
+    MapProtocolService mapProtocolService;
+
     private Integer numNeighbors;
 
     public volatile ArrayList<Integer> localState;
@@ -72,6 +75,16 @@ public class StateService {
 
     private void updateLocalState_ReceivedAppMessage(AppMessage appMessage) {
         localState.set(nodeID, localState.get(nodeID) + 1);
+        ArrayList<Integer> mls = appMessage.getLocalState();
+
+        int size = localState.size();
+        for (int i = 0; i < size; i++) {
+            if (localState.get(i) < mls.get(i)) {
+                localState.set(i, mls.get(i));
+            }
+        }
+
+        System.out.println("RECE APP MESSAGE - fr node id: " + appMessage.getFromNodeID() + " - MESSAGE STATE: " + localState.toString());
     }
 
     public AppMessage updateLocalState_SendingAppMessage() {
@@ -80,6 +93,7 @@ public class StateService {
         appMessageToSend.setSnapshotPeriod(currentSnapshotPeriod.get());
         appMessageToSend.setLocalState((ArrayList<Integer>)localState.clone());
         appMessageToSend.setFromNodeID(nodeID);
+
         return appMessageToSend;
     }
 
@@ -117,6 +131,7 @@ public class StateService {
             localChannelState.setNumMarkerMessagesReceived(1);
         }
 
+        localChannelState.setIsActive(mapProtocolService.getIsActive().get());
         localChannelState.setLocalState((ArrayList<Integer>)localState.clone());
 
         inProgress.put(csp, localChannelState);

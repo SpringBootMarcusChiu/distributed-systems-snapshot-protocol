@@ -37,6 +37,9 @@ public class ConvergeCastMessageService {
     @Autowired
     FileService fileService;
 
+    @Autowired
+    HaltService haltService;
+
     // final variables
     private String parentConvergeCastURL;
     private Integer numChildrenPlusOne;
@@ -110,8 +113,21 @@ public class ConvergeCastMessageService {
             } else {
                 System.out.println("SNAPSHOT PERIOD: " + snapshotPeriod + " - COMPLETED");
                 fileService.writeSnapshot(localChannelStates);
+                if (isMapProtocolFinishedInAllNodes(localChannelStates)) {
+                    haltService.initiateShutdown();
+                }
             }
         }).start();
+    }
+
+    private Boolean isMapProtocolFinishedInAllNodes(ArrayList<LocalChannelState> localChannelStates) {
+        for (LocalChannelState localChannelState : localChannelStates) {
+            if (localChannelState.getIsActive() || localChannelState.getChannelState().size() > 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void sendConvergeCastMessageToParentNode(Integer snapshotPeriod, ArrayList<LocalChannelState> localChannelStates) {

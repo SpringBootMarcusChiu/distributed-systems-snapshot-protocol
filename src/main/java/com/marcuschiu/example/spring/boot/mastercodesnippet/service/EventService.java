@@ -28,6 +28,9 @@ public class EventService {
     @Autowired
     MarkerMessageService markerMessageService;
 
+    @Autowired
+    StateService stateService;
+
     @Async
     public void sendAppMessage(Integer toNodeID) {
         reLock.lock();
@@ -57,5 +60,10 @@ public class EventService {
         } finally {
             reLock.unlock();
         }
+    }
+
+    @Async
+    public void selfInitiateSnapshot() {
+        stateService.selfInitiateSnapshot();
     }
 }

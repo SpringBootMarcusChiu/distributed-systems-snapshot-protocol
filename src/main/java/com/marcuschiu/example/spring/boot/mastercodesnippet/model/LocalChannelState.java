@@ -11,6 +11,7 @@ public class LocalChannelState {
     ArrayList<AppMessage> channelState;
     ArrayList<Integer> localState;
     Integer numMarkerMessagesReceived;
+    Boolean isActive;
 
     public Integer incAndGetNumMarkerMessagesReceived() {
         numMarkerMessagesReceived++;

@@ -10,16 +10,29 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class FileService {
 
+    // better than synchronized (intrinsic lock)
+    // checks the queued threads and gives priority access to the longest waiting one
+    private final ReentrantLock reLock = new ReentrantLock(true);
+
     private final String filePrefix;
     private final String outputDirectoryPath = "output/";
+    private HashMap<Integer, String> outputFileNames;
 
     @Autowired
     public FileService(Configuration configuration) {
         filePrefix = configuration.getFileName();
+        outputFileNames = new HashMap<>();
+        for (int i = 0; i < configuration.getNumNodes(); i++) {
+            String f = "output/"+ filePrefix + "-" + i + ".txt";
+            outputFileNames.put(i,f);
+        }
+
         cleanOutputDirectory(outputDirectoryPath);
     }
 
@@ -34,15 +47,28 @@ public class FileService {
     }
 
     public void writeSnapshot(ArrayList<LocalChannelState> localChannelStates) {
-
+        reLock.lock();
+        try {
+            synchronizedWriteSnapshot(localChannelStates);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            reLock.unlock();
+        }
     }
 
-    public void whenWriteStringUsingBufferedWritter_thenCorrect() throws IOException {
-        String str = "Hello";
-        BufferedWriter writer = new BufferedWriter(new FileWriter("output/"+ filePrefix +".txt", true));
-        writer.write(str);
-        writer.write(str);
-        writer.write(str);
-        writer.close();
+    private void synchronizedWriteSnapshot(ArrayList<LocalChannelState> localChannelStates) throws IOException {
+        Integer nodeID;
+
+        for (LocalChannelState localChannelState : localChannelStates) {
+            nodeID = localChannelState.getNodeID();
+            StringBuilder line = new StringBuilder();
+            for (Integer i : localChannelState.getLocalState()) {
+                line.append(i.toString()).append(" ");
+            }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileNames.get(nodeID), true))) {
+                writer.write(line.append("\n").toString());
+            }
+        }
     }
 }

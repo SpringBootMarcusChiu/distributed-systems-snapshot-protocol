@@ -57,8 +57,8 @@ public class AppMessageService {
                 appMessageToSend,
                 String.class);
 
-        numAppMessagesSent.incrementAndGet();
+        Integer numSent = numAppMessagesSent.incrementAndGet();
 
-        System.out.println("SENT APP MESSAGE - to node id: " + toNodeID + " - MESSAGE STATE: " + appMessageToSend.getLocalState().toString());
+        System.out.println("SENT APP MESSAGE - to node id: " + toNodeID + " - MESSAGE STATE: " + appMessageToSend.getLocalState().toString() + " - NUM SENT: " + numSent);
     }
 }
