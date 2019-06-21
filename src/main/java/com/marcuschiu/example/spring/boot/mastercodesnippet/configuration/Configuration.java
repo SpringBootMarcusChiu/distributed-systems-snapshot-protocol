@@ -36,10 +36,10 @@ public class Configuration {
             ConfigurationNodeInfo configurationNodeInfo = new ConfigurationNodeInfo();
 
             String[] nodeInfo = lines.get(i).split(" ");
-            configurationNodeInfo.nodeID = nodeInfo[0];
+            configurationNodeInfo.nodeID = Integer.parseInt(nodeInfo[0]);
             configurationNodeInfo.hostname = nodeInfo[1];
             configurationNodeInfo.port = nodeInfo[2];
-            configurationNodeInfo.neighbors = Arrays.stream(lines.get(i + this.numNodes).split(" "))
+            configurationNodeInfo.neighborNodeIDs = Arrays.stream(lines.get(i + this.numNodes).split(" "))
                                                     .map(Integer::parseInt)
                                                     .collect(Collectors.toCollection(ArrayList::new));
 

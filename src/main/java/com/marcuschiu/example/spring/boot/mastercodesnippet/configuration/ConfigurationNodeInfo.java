@@ -7,11 +7,11 @@ import java.util.ArrayList;
 @Data
 public class ConfigurationNodeInfo {
 
-    String nodeID;
+    Integer nodeID;
     String hostname;
     String port;
 
     String nodeURL;
 
-    ArrayList<Integer> neighbors;
+    ArrayList<Integer> neighborNodeIDs;
 }

@@ -2,10 +2,7 @@ package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.model.AppMessage;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessage;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.model.MarkerMessageResponse;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.AppMessageService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MarkerMessageService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -55,42 +52,39 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 		}
 	}
 
-	@Value("${node.id}")
-	private Integer nodeID;
+    @Value("${node.id}")
+    private Integer nodeID;
 
-	@Autowired
-	MarkerMessageService markerMessageService;
+    @Autowired
+	EventService eventService;
 
-	@Autowired
-	AppMessageService appMessageService;
+    @Bean
+    public Configuration configuration() throws FileNotFoundException {
+        File file = ResourceUtils.getFile("classpath:configuration.txt");
+        return new Configuration(file);
+    }
 
-	@Bean
-	public Configuration configuration() throws FileNotFoundException {
-		File file = ResourceUtils.getFile("classpath:configuration.txt");
-		return new Configuration(file);
-	}
-
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
 	@Override
 	public void run(String... strings) throws Exception {
-		if (this.nodeID == 0) {
+		if (nodeID == 0) {
 			System.out.println("\n\nTHIS NODE IS ZERO");
 			System.out.println("press any key to startMAPProtocol");
 			System.in.read();
 
-//			AppMessage appMessage = new AppMessage();
-//			appMessage.setFromNodeID(0);
-//			appMessageService.acceptMessage(appMessage);
+			AppMessage appMessage = new AppMessage();
+			appMessage.setSnapshotPeriod(0);
+			appMessage.setFromNodeID(0);
+			eventService.process(appMessage);
 
-			MarkerMessage markerMessage = new MarkerMessage();
-			markerMessage.setFromNodeID(0);
-			markerMessage.setSnapshotPeriod(1);
-			MarkerMessageResponse markerMessageResponse = markerMessageService.acceptMessage(markerMessage);
-			System.out.println(markerMessageResponse.getMarkerMessageResponseLocals());
+//			MarkerMessage markerMessage = new MarkerMessage();
+//			markerMessage.setFromNodeID(0);
+//			markerMessage.setSnapshotPeriod(1);
+//            eventService.process(markerMessage);
 		}
 		// every other node waits for node zero
 	}

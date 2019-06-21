@@ -2,8 +2,10 @@ package com.marcuschiu.example.spring.boot.mastercodesnippet.model;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+
 @Data
-public class AppMessage {
+public class ConvergeCastMessage {
     Integer snapshotPeriod;
-    Integer fromNodeID;
+    ArrayList<LocalChannelState> localChannelStates;
 }

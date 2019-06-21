@@ -1,4 +1,4 @@
-package com.marcuschiu.example.spring.boot.mastercodesnippet.service.mst;
+package com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.mst;
 
 import java.util.ArrayList;
 import java.util.Comparator;
