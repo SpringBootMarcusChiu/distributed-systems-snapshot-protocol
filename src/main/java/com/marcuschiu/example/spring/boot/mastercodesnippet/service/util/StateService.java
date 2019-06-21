@@ -80,7 +80,7 @@ public class StateService {
     public void processMarkerMessage(MarkerMessage markerMessage) {
         if (markerMessage.getSnapshotPeriod() > currentSnapshotPeriod.get()) {
 //            System.out.println("RECEIVED - MARKER MESSAGE - from node id: " + markerMessage.getFromNodeID() + " - FIRST");
-            recordNewLocalChannelState();
+            recordNewLocalChannelState(false);
             markerMessageService.sendMarkerMessagesToNeighbors(markerMessage.getSnapshotPeriod());
         } else {
 //            System.out.println("RECEIVED - MARKER MESSAGE - from node id: " + markerMessage.getFromNodeID() + " - DUPLICATE");
@@ -88,7 +88,15 @@ public class StateService {
         }
     }
 
-    private void recordNewLocalChannelState() {
+    /**
+     * this method call only works for one node for now
+     */
+    public void selfInitiateSnapshot() {
+        recordNewLocalChannelState(true);
+        markerMessageService.sendMarkerMessagesToNeighbors(currentSnapshotPeriod.get());
+    }
+
+    private void recordNewLocalChannelState(Boolean selfInitiate) {
         Integer csp = currentSnapshotPeriod.incrementAndGet();
 
         LocalChannelState localChannelState = new LocalChannelState();
@@ -96,7 +104,13 @@ public class StateService {
         localChannelState.setChannelState(new ArrayList<>());
         localChannelState.setNodeID(nodeID);
         localChannelState.setSnapshotPeriod(csp);
-        localChannelState.setNumMarkerMessagesReceived(1);
+
+        if (selfInitiate) {
+            localChannelState.setNumMarkerMessagesReceived(0);
+        } else {
+            localChannelState.setNumMarkerMessagesReceived(1);
+        }
+
         localChannelState.setLocalState((ArrayList<Integer>)localState.clone());
 
         inProgress.put(csp, localChannelState);

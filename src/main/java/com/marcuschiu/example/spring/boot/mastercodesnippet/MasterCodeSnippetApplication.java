@@ -1,8 +1,8 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.model.AppMessage;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.util.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -58,6 +58,9 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
     @Autowired
 	EventService eventService;
 
+    @Autowired
+	StateService stateService;
+
     @Bean
     public Configuration configuration() throws FileNotFoundException {
         File file = ResourceUtils.getFile("classpath:configuration.txt");
@@ -76,15 +79,12 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 			System.out.println("press any key to startMAPProtocol");
 			System.in.read();
 
-			AppMessage appMessage = new AppMessage();
-			appMessage.setSnapshotPeriod(0);
-			appMessage.setFromNodeID(0);
-			eventService.process(appMessage);
+//			AppMessage appMessage = new AppMessage();
+//			appMessage.setSnapshotPeriod(0);
+//			appMessage.setFromNodeID(0);
+//			eventService.process(appMessage);
 
-//			MarkerMessage markerMessage = new MarkerMessage();
-//			markerMessage.setFromNodeID(0);
-//			markerMessage.setSnapshotPeriod(1);
-//            eventService.process(markerMessage);
+			stateService.selfInitiateSnapshot();
 		}
 		// every other node waits for node zero
 	}
