@@ -24,6 +24,7 @@ public class ConvergeCastMessageService {
     // better than synchronized (intrinsic lock)
     // checks the queued threads and gives priority access to the longest waiting one
     private final ReentrantLock reLockConvergeCast = new ReentrantLock(true);
+    // TODO maybe move this to EventService?
 
     @Value("${node.id}")
     Integer nodeID;
@@ -35,10 +36,10 @@ public class ConvergeCastMessageService {
     Configuration configuration;
 
     @Autowired
-    FileService fileService;
+    HaltService haltService;
 
     @Autowired
-    HaltService haltService;
+    PerpetualSnapshotTakingService perpetualSnapshotTakingService;
 
     // final variables
     private String parentConvergeCastURL;
@@ -50,7 +51,7 @@ public class ConvergeCastMessageService {
     private volatile HashMap<Integer, ConvergeCastState> convergeCastStuff;
 
     @PostConstruct
-    public void ConvergeCastMessageService() {
+    public void convergeCastMessageService() {
         GraphNetworkNode graphNetworkNode = get();
         if (nodeID != 0) {
             parentNodeID = graphNetworkNode.getParentID();
@@ -111,23 +112,9 @@ public class ConvergeCastMessageService {
             if (nodeID != 0) {
                 sendConvergeCastMessageToParentNode(snapshotPeriod, localChannelStates);
             } else {
-                System.out.println("SNAPSHOT PERIOD: " + snapshotPeriod + " - COMPLETED");
-                fileService.writeSnapshot(localChannelStates);
-                if (isMapProtocolFinishedInAllNodes(localChannelStates)) {
-                    haltService.initiateShutdown();
-                }
+                perpetualSnapshotTakingService.receivedAllLocalChannelStates(snapshotPeriod, localChannelStates);
             }
         }).start();
-    }
-
-    private Boolean isMapProtocolFinishedInAllNodes(ArrayList<LocalChannelState> localChannelStates) {
-        for (LocalChannelState localChannelState : localChannelStates) {
-            if (localChannelState.getIsActive() || localChannelState.getChannelState().size() > 0) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void sendConvergeCastMessageToParentNode(Integer snapshotPeriod, ArrayList<LocalChannelState> localChannelStates) {

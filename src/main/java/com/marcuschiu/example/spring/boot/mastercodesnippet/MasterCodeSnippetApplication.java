@@ -1,9 +1,8 @@
 package com.marcuschiu.example.spring.boot.mastercodesnippet;
 
 import com.marcuschiu.example.spring.boot.mastercodesnippet.configuration.Configuration;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.EventService;
 import com.marcuschiu.example.spring.boot.mastercodesnippet.service.MapProtocolService;
-import com.marcuschiu.example.spring.boot.mastercodesnippet.service.StateService;
+import com.marcuschiu.example.spring.boot.mastercodesnippet.service.PerpetualSnapshotTakingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Collections;
 
 /**
@@ -55,14 +55,11 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
     @Value("${node.id}")
 	Integer nodeID;
 
-	@Autowired
-	Configuration configuration;
-
     @Autowired
 	MapProtocolService mapProtocolService;
 
     @Autowired
-	EventService eventService;
+	PerpetualSnapshotTakingService perpetualSnapshotTakingService;
 
     @Bean
     public Configuration configuration() throws FileNotFoundException {
@@ -84,16 +81,8 @@ public class MasterCodeSnippetApplication implements CommandLineRunner {
 			System.in.read();
 
 			mapProtocolService.startMAPProtocol();
-			runSnapshot();
+			perpetualSnapshotTakingService.runPerpetualSnapshotTaking();
 		}
 		// every other node waits for node zero
-	}
-
-	public void runSnapshot() throws InterruptedException {
-    	Integer delay = configuration.getSnapshotDelay();
-    	for (int i = 0; i < 4; i++) {
-    		Thread.sleep(delay);
-			eventService.selfInitiateSnapshot();
-		}
 	}
 }

@@ -31,7 +31,7 @@ public class MarkerMessageService {
     private MarkerMessage markerMessageToNeighbor;
 
     @PostConstruct
-    public void MarkerMessageService() {
+    public void markerMessageService() {
         neighborNodeMarkerURLs = new ArrayList<>();
         ArrayList<Integer> neighborNodeIDs = configuration.getConfigurationNodeInfos().get(nodeID).getNeighborNodeIDs();
         for (Integer neighborID : neighborNodeIDs) {
@@ -47,8 +47,9 @@ public class MarkerMessageService {
         stateService.processMarkerMessage(markerMessage);
     }
 
-    public void sendMarkerMessagesToNeighbors(Integer snapshotPeriod) {
+    public void sendMarkerMessagesToNeighbors(Integer snapshotPeriod, Boolean shutdown) {
         markerMessageToNeighbor.setSnapshotPeriod(snapshotPeriod);
+        markerMessageToNeighbor.setShutdown(shutdown);
 
         for (String neighborNodeMarkerURL : neighborNodeMarkerURLs) {
             restTemplate.postForObject(neighborNodeMarkerURL, markerMessageToNeighbor, String.class);

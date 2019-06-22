@@ -33,6 +33,9 @@ public class StateService {
     @Autowired
     MapProtocolService mapProtocolService;
 
+    @Autowired
+    HaltService haltService;
+
     private Integer numNeighbors;
 
     public volatile ArrayList<Integer> localState;
@@ -40,7 +43,7 @@ public class StateService {
     private volatile HashMap<Integer, LocalChannelState> inProgress;
 
     @PostConstruct
-    public void StateService() {
+    public void stateService() {
         currentSnapshotPeriod = new AtomicInteger(0);
         numNeighbors = configuration.getConfigurationNodeInfos().get(nodeID).getNeighborNodeIDs().size();
         inProgress = new HashMap<>();
@@ -101,7 +104,9 @@ public class StateService {
         if (markerMessage.getSnapshotPeriod() > currentSnapshotPeriod.get()) {
 //            System.out.println("RECEIVED - MARKER MESSAGE - from node id: " + markerMessage.getFromNodeID() + " - FIRST");
             recordNewLocalChannelState(false);
-            markerMessageService.sendMarkerMessagesToNeighbors(markerMessage.getSnapshotPeriod());
+            markerMessageService.sendMarkerMessagesToNeighbors(
+                    markerMessage.getSnapshotPeriod(),
+                    markerMessage.getShutdown());
         } else {
 //            System.out.println("RECEIVED - MARKER MESSAGE - from node id: " + markerMessage.getFromNodeID() + " - DUPLICATE");
             updateLocalChannelState(markerMessage);
@@ -113,7 +118,16 @@ public class StateService {
      */
     public void selfInitiateSnapshot() {
         recordNewLocalChannelState(true);
-        markerMessageService.sendMarkerMessagesToNeighbors(currentSnapshotPeriod.get());
+        markerMessageService.sendMarkerMessagesToNeighbors(
+                currentSnapshotPeriod.get(),
+                false);
+    }
+
+    public void selfInitiateShutdown() {
+        recordNewLocalChannelState(true);
+        markerMessageService.sendMarkerMessagesToNeighbors(
+                currentSnapshotPeriod.get(),
+                true);
     }
 
     private void recordNewLocalChannelState(Boolean selfInitiate) {
@@ -145,9 +159,14 @@ public class StateService {
             if (numReceived.equals(numNeighbors)) {
                 inProgress.remove(markerSnapshotPeriod);
                 System.out.println("RECEIVED All Marker Messages For Snapshot Period: " + markerSnapshotPeriod);
-                convergeCastMessageService.processSelfLocalChannelState(
-                        markerSnapshotPeriod,
-                        localChannelState);
+
+                if (markerMessage.getShutdown()) {
+                    haltService.initiateShutdown();
+                } else {
+                    convergeCastMessageService.processSelfLocalChannelState(
+                            markerSnapshotPeriod,
+                            localChannelState);
+                }
             }
         } else {
             System.out.println("ERROR: received useless marker message");

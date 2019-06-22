@@ -41,7 +41,7 @@ public class MapProtocolService {
     public volatile AtomicInteger numMessagesQueuedToBeSent;
 
     @PostConstruct
-    public void MapProtocolService() {
+    public void mapProtocolService() {
         isActive = new AtomicBoolean(false);
         numMessagesQueuedToBeSent = new AtomicInteger(0);
         maxNumber = configuration.getMaxNumber();

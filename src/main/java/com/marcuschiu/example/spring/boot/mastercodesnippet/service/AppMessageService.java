@@ -33,7 +33,7 @@ public class AppMessageService {
     private volatile HashMap<Integer, String> nodeAppURLs;
 
     @PostConstruct
-    public void AppMessageService() {
+    public void appMessageService() {
         numAppMessagesSent = new AtomicInteger(0);
 
         nodeAppURLs = new HashMap<>();

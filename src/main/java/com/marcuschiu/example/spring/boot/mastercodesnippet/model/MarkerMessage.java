@@ -6,4 +6,5 @@ import lombok.Data;
 public class MarkerMessage {
     Integer snapshotPeriod;
     Integer fromNodeID;
+    Boolean shutdown;
 }

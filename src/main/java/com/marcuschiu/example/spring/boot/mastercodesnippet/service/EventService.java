@@ -28,6 +28,7 @@ public class EventService {
     @Autowired
     MarkerMessageService markerMessageService;
 
+    @Lazy
     @Autowired
     StateService stateService;
 
