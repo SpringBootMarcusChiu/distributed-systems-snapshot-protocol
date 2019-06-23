@@ -1,3 +1,5 @@
 - install Java Version 1.8
 - mvn clean package
 - mvn spring-boot:run
+- mvn spring-boot:run -Drun.arguments=--node.id=0
+- ./mvnw spring-boot:run -Drun.arguments=--node.id=0
