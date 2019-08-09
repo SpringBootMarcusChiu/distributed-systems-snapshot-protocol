@@ -13,3 +13,6 @@
   - the command above will both:
     - download the dependent java libraries
     - then start the application
+    
+- running it on Google Cloud Compute
+  - ./mvnw -Djavax.net.ssl.trustStore=/home/marcus/mytruststore -Djavax.net.ssl.trustStorePassword=foobar spring-boot:run -Drun.arguments=--node.id=0
